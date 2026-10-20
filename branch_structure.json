@@ -1,0 +1,21 @@
+{
+  "default_branch": "main",
+  "branches": [
+    "feat/issue-1487-reputation-deposit-availability-probe-sep-24",
+    "fix/issue-1531-ops-replace-architecture-md-s-planned-markers",
+    "main",
+    "origin"
+  ],
+  "parent": {
+    "feat/issue-1487-reputation-deposit-availability-probe-sep-24": "main",
+    "fix/issue-1531-ops-replace-architecture-md-s-planned-markers": "main",
+    "main": null,
+    "origin": "main"
+  },
+  "order": [
+    "main",
+    "feat/issue-1487-reputation-deposit-availability-probe-sep-24",
+    "fix/issue-1531-ops-replace-architecture-md-s-planned-markers",
+    "origin"
+  ]
+}

@@ -7,6 +7,6 @@ export interface AnchorLeaderboardEntry {
   corridorId: string | null;
   composite: number;
   fillRate: number;
-  settleP50: number;
+  settleP10: number;
   slippage: number;
 }
