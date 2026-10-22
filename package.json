@@ -7,10 +7,10 @@
   ],
   "scripts": {
     "predev": "npm run build --workspace=@stellarintel/publisher",
-    "dev": "node api.js && next dev",
+    "dev": "next dev",
     "prebuild": "npm run build --workspace=@stellarintel/publisher && npm run emit-api-reference && npm run emit-llms-full",
-    "build": "node api.js && node ./scripts/emit-version.js && next build",
-    "start": "node api.js && next start",
+    "build": "node ./scripts/emit-version.js && next build",
+    "start": "next start",
     "lint": "eslint --max-warnings 0",
     "lint:fix": "eslint --fix",
     "pretypecheck": "npm run build --workspace=@stellarintel/publisher",
