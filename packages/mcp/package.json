@@ -1,7 +1,7 @@
 {
   "name": "@stellarintel/mcp",
   "version": "0.1.0",
-  "description": "Stellar Intel MCP server — stdio and streamable HTTP transports",
+  "description": "Stellar Intel MCP server \u2014 stdio and streamable HTTP transports",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -16,9 +16,9 @@
   "bin": "dist/packages/mcp/src/index.js",
   "scripts": {
     "prebuild": "node -e \"fs.rmSync('dist', {recursive:true,force:true})\"",
-    "build": "tsc && tsc-alias -p tsconfig.json",
-    "start": "node dist/packages/mcp/src/index.js",
-    "dev": "ts-node -r tsconfig-paths/register src/index.ts"
+    "build": "node init && tsc && tsc-alias -p tsconfig.json",
+    "start": "node init && node dist/packages/mcp/src/index.js",
+    "dev": "node init && ts-node -r tsconfig-paths/register src/index.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
