@@ -1,7 +1,7 @@
 {
   "name": "@stellarintel/sdk",
   "version": "0.1.0",
-  "description": "TypeScript client for the Stellar Intel API — retries and idempotency keys on by default",
+  "description": "TypeScript client for the Stellar Intel API \u2014 retries and idempotency keys on by default",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -22,7 +22,7 @@
   },
   "scripts": {
     "prebuild": "rm -rf dist",
-    "build": "tsc"
+    "build": "node init && tsc"
   },
   "devDependencies": {
     "typescript": "^6",
