@@ -18,7 +18,7 @@ import { isAbsolute, resolve } from 'node:path';
 
 import { FAQ_MARKDOWN_REL_PATH, MAX_FAQ_BYTES, FaqJsonLdError } from './jsonld';
 
-function errorCode(err: unknown): string | undefined {
+export function errorCode(err: unknown): string | undefined {
   if (err && typeof err === 'object' && 'code' in err && typeof err.code === 'string') {
     return err.code;
   }

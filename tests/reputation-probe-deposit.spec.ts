@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { probeDepositAvailability, probeAllAnchorDeposits } from '@/lib/reputation/probe';
+import { probeAllAnchors } from '@/lib/reputation/probe';
 import { ANCHORS } from '@/constants/anchors';
 
 type Sample = {
@@ -19,7 +19,7 @@ function makeStore() {
     recordProbeSample: vi.fn(async (s: Sample) => {
       samples.push(s);
     }),
-  } as unknown as Parameters<typeof probeDepositAvailability>[1] & { samples: Sample[] };
+  };
 }
 
 const anchor = ANCHORS[0];
@@ -36,20 +36,20 @@ const infoOk = {
   },
 };
 
-describe('probeDepositAvailability', () => {
+describe('deposit-availability probe samples', () => {
   it('records a reachable sample for an enabled deposit asset', async () => {
     const store = makeStore();
     const fetchInfo = vi.fn(async () => infoOk);
     const now = () => new Date('2025-01-01T00:00:00Z');
 
-    const samples = await probeDepositAvailability(anchor, store, {
+    const samples = await probeAllAnchors([anchor], store as never, {
       fetchInfo,
       now,
       resolveToml: async () => tomlWithSep24,
       assets: () => [{ code: 'USDC' }],
     } as never);
 
-    const usdc = samples.find((s) => s.corridor === 'deposit:USDC');
+    const usdc = (samples as Sample[]).find((s) => s.corridor === 'deposit:USDC');
     expect(usdc).toBeDefined();
     expect(usdc!.reachable).toBe(true);
     expect(usdc!.error).toBeUndefined();
@@ -59,14 +59,14 @@ describe('probeDepositAvailability', () => {
     const store = makeStore();
     const fetchInfo = vi.fn(async () => infoOk);
 
-    const samples = await probeDepositAvailability(anchor, store, {
+    const samples = await probeAllAnchors([anchor], store as never, {
       fetchInfo,
       now: () => new Date('2025-01-01T00:00:00Z'),
       resolveToml: async () => tomlWithSep24,
       assets: () => [{ code: 'EURC' }],
     } as never);
 
-    const eurc = samples.find((s) => s.corridor === 'deposit:EURC');
+    const eurc = (samples as Sample[]).find((s) => s.corridor === 'deposit:EURC');
     expect(eurc).toBeDefined();
     expect(eurc!.reachable).toBe(false);
     expect(eurc!.failureType).toBe('unknown');
@@ -79,12 +79,12 @@ describe('probeDepositAvailability', () => {
       throw new Error('ECONNREFUSED');
     });
 
-    const samples = await probeDepositAvailability(anchor, store, {
+    const samples = (await probeAllAnchors([anchor], store as never, {
       fetchInfo,
       now: () => new Date('2025-01-01T00:00:00Z'),
       resolveToml: async () => tomlWithSep24,
       assets: () => [{ code: 'USDC' }],
-    } as never);
+    } as never)) as Sample[];
 
     expect(samples.length).toBeGreaterThan(0);
     expect(samples.every((s) => s.reachable === false)).toBe(true);
@@ -95,20 +95,18 @@ describe('probeDepositAvailability', () => {
     const store = makeStore();
     const fetchInfo = vi.fn(async () => infoOk);
 
-    const samples = await probeDepositAvailability(anchor, store, {
+    const samples = (await probeAllAnchors([anchor], store as never, {
       fetchInfo,
       now: () => new Date('2025-01-01T00:00:00Z'),
       resolveToml: async () => ({ serviceDomain: 'anchor.example' }),
       assets: () => [{ code: 'USDC' }],
-    } as never);
+    } as never)) as Sample[];
 
     expect(samples).toHaveLength(1);
     expect(samples[0].reachable).toBe(false);
     expect(fetchInfo).not.toHaveBeenCalled();
   });
-});
 
-describe('probeAllAnchorDeposits', () => {
   it('does not abort the fleet run when one anchor fails', async () => {
     const store = makeStore();
     const fetchInfo = vi.fn(async (url: string) => {
@@ -117,17 +115,19 @@ describe('probeAllAnchorDeposits', () => {
     });
 
     await expect(
-      probeAllAnchorDeposits(store, {
-        fetchInfo,
-        now: () => new Date('2025-01-01T00:00:00Z'),
-        resolveToml: async (domain: string) =>
-          domain.includes('bad')
-            ? (() => {
-                throw new Error('toml failure');
-              })()
-            : tomlWithSep24,
-        assets: () => [{ code: 'USDC' }],
-      } as never)
+      probeAllAnchors(
+        [anchor, { ...anchor, domain: 'bad.example' } as typeof anchor],
+        store as never,
+        {
+          fetchInfo,
+          now: () => new Date('2025-01-01T00:00:00Z'),
+          resolveToml: async (domain: string) => {
+            if (domain.includes('bad')) throw new Error('toml failure');
+            return tomlWithSep24;
+          },
+          assets: () => [{ code: 'USDC' }],
+        } as never
+      )
     ).resolves.not.toThrow();
   });
 });
